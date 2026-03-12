@@ -1,6 +1,6 @@
 function getMonday(date = new Date()) {
   const current = new Date(date);
-  const day = current.getDay(); // 0 = Sonntag, 1 = Montag ...
+  const day = current.getDay();
   const diff = day === 0 ? -6 : 1 - day;
 
   current.setHours(0, 0, 0, 0);
@@ -22,9 +22,12 @@ function formatDate(date) {
   return `${day}.${month}.${year}`;
 }
 
-function getWeekDates(weekOffset = 0) {
+function getWeekDates(weekType = 'current') {
   const monday = getMonday(new Date());
-  monday.setDate(monday.getDate() + weekOffset * 7);
+
+  if (weekType === 'next') {
+    monday.setDate(monday.getDate() + 7);
+  }
 
   return {
     monday: addDays(monday, 0),

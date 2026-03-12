@@ -6,10 +6,41 @@ const updateOverviewMessage = require('../../utils/updateOverviewMessage');
 
 const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
 
+function emptyWeek() {
+  return {
+    days: {
+      monday: { meetingTime: '', entries: [] },
+      tuesday: { meetingTime: '', entries: [] },
+      wednesday: { meetingTime: '', entries: [] },
+      thursday: { meetingTime: '', entries: [] },
+      friday: { meetingTime: '', entries: [] },
+      saturday: { meetingTime: '', entries: [] },
+      sunday: { meetingTime: '', entries: [] }
+    }
+  };
+}
+
+function defaultSchedule() {
+  return {
+    currentWeek: emptyWeek(),
+    nextWeek: emptyWeek()
+  };
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('set-meeting-time')
     .setDescription('Setzt die Treffpunktzeit für einen Wochentag')
+    .addStringOption(option =>
+      option
+        .setName('week')
+        .setDescription('Welche Woche soll bearbeitet werden?')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Aktuelle Woche', value: 'currentWeek' },
+          { name: 'Nächste Woche', value: 'nextWeek' }
+        )
+    )
     .addStringOption(option =>
       option
         .setName('day')
@@ -42,29 +73,25 @@ module.exports = {
       });
     }
 
+    const week = interaction.options.getString('week');
     const day = interaction.options.getString('day');
     const time = interaction.options.getString('time');
 
-    const schedule = readJson(schedulePath, {
-      weekOffset: 0,
-      days: {
-        monday: { meetingTime: '', entries: [] },
-        tuesday: { meetingTime: '', entries: [] },
-        wednesday: { meetingTime: '', entries: [] },
-        thursday: { meetingTime: '', entries: [] },
-        friday: { meetingTime: '', entries: [] },
-        saturday: { meetingTime: '', entries: [] },
-        sunday: { meetingTime: '', entries: [] }
-      }
-    });
+    const schedule = readJson(schedulePath, defaultSchedule());
 
-    schedule.days[day].meetingTime = time;
+    if (!schedule[week]) {
+      schedule[week] = emptyWeek();
+    }
+
+    schedule[week].days[day].meetingTime = time;
     writeJson(schedulePath, schedule);
 
     await updateOverviewMessage(client);
 
+    const weekLabel = week === 'currentWeek' ? 'aktuelle Woche' : 'nächste Woche';
+
     await interaction.reply({
-      content: `✅ Treffpunkt für **${day}** wurde auf **${time} Uhr** gesetzt.`,
+      content: `✅ Treffpunkt für **${day}** wurde in der **${weekLabel}** auf **${time} Uhr** gesetzt.`,
       ephemeral: true
     });
   }

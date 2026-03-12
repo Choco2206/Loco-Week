@@ -1,42 +1,66 @@
 {
-  "weekOffset": 0,
-  "days": {
-    "monday": {
-      "meetingTime": "",
-      "entries": [
-        {
-          "id": "entry_1773355731786",
-          "mode": "match",
-          "type": "VPG",
-          "time": "21:00",
-          "opponent": "Samba",
-          "text": ""
-        }
-      ]
-    },
-    "tuesday": {
-      "meetingTime": "",
-      "entries": []
-    },
-    "wednesday": {
-      "meetingTime": "",
-      "entries": []
-    },
-    "thursday": {
-      "meetingTime": "",
-      "entries": []
-    },
-    "friday": {
-      "meetingTime": "",
-      "entries": []
-    },
-    "saturday": {
-      "meetingTime": "",
-      "entries": []
-    },
-    "sunday": {
-      "meetingTime": "",
-      "entries": []
+  "currentWeek": {
+    "days": {
+      "monday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "tuesday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "wednesday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "thursday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "friday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "saturday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "sunday": {
+        "meetingTime": "",
+        "entries": []
+      }
+    }
+  },
+  "nextWeek": {
+    "days": {
+      "monday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "tuesday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "wednesday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "thursday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "friday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "saturday": {
+        "meetingTime": "",
+        "entries": []
+      },
+      "sunday": {
+        "meetingTime": "",
+        "entries": []
+      }
     }
   }
 }

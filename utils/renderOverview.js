@@ -9,6 +9,27 @@ const {
 
 const schedulePath = path.join(__dirname, '..', 'data', 'schedule.json');
 
+function emptyWeek() {
+  return {
+    days: {
+      monday: { meetingTime: '', entries: [] },
+      tuesday: { meetingTime: '', entries: [] },
+      wednesday: { meetingTime: '', entries: [] },
+      thursday: { meetingTime: '', entries: [] },
+      friday: { meetingTime: '', entries: [] },
+      saturday: { meetingTime: '', entries: [] },
+      sunday: { meetingTime: '', entries: [] }
+    }
+  };
+}
+
+function defaultSchedule() {
+  return {
+    currentWeek: emptyWeek(),
+    nextWeek: emptyWeek()
+  };
+}
+
 function sortEntries(entries = []) {
   return [...entries].sort((a, b) => {
     const aTime = a.time || '99:99';
@@ -48,20 +69,10 @@ function renderEntry(entry) {
 }
 
 function renderOverview() {
-  const schedule = readJson(schedulePath, {
-    weekOffset: 0,
-    days: {
-      monday: { meetingTime: '', entries: [] },
-      tuesday: { meetingTime: '', entries: [] },
-      wednesday: { meetingTime: '', entries: [] },
-      thursday: { meetingTime: '', entries: [] },
-      friday: { meetingTime: '', entries: [] },
-      saturday: { meetingTime: '', entries: [] },
-      sunday: { meetingTime: '', entries: [] }
-    }
-  });
+  const schedule = readJson(schedulePath, defaultSchedule());
+  const currentWeek = schedule.currentWeek || emptyWeek();
+  const weekDates = getWeekDates('current');
 
-  const weekDates = getWeekDates(schedule.weekOffset || 0);
   const orderedDays = [
     'monday',
     'tuesday',
@@ -77,7 +88,7 @@ function renderOverview() {
   lines.push('');
 
   for (const dayKey of orderedDays) {
-    const dayData = schedule.days?.[dayKey] || { meetingTime: '', entries: [] };
+    const dayData = currentWeek.days?.[dayKey] || { meetingTime: '', entries: [] };
     const label = getGermanDayLabel(dayKey);
     const dateText = formatDate(weekDates[dayKey]);
 

@@ -6,9 +6,8 @@ const updateOverviewMessage = require("../../utils/updateOverviewMessage");
 
 const schedulePath = path.join(__dirname, "..", "..", "data", "schedule.json");
 
-function defaultSchedule() {
+function emptyWeek() {
   return {
-    weekOffset: 0,
     days: {
       monday: { meetingTime: "", entries: [] },
       tuesday: { meetingTime: "", entries: [] },
@@ -21,10 +20,27 @@ function defaultSchedule() {
   };
 }
 
+function defaultSchedule() {
+  return {
+    currentWeek: emptyWeek(),
+    nextWeek: emptyWeek()
+  };
+}
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("add-entry")
     .setDescription("Fügt einen Eintrag zur Wochenübersicht hinzu")
+    .addStringOption(option =>
+      option
+        .setName("week")
+        .setDescription("Welche Woche soll bearbeitet werden?")
+        .setRequired(true)
+        .addChoices(
+          { name: "Aktuelle Woche", value: "currentWeek" },
+          { name: "Nächste Woche", value: "nextWeek" }
+        )
+    )
     .addStringOption(option =>
       option
         .setName("day")
@@ -99,6 +115,7 @@ module.exports = {
       });
     }
 
+    const week = interaction.options.getString("week");
     const day = interaction.options.getString("day");
     const mode = interaction.options.getString("mode");
     const type = interaction.options.getString("type") || "";
@@ -122,7 +139,11 @@ module.exports = {
 
     const schedule = readJson(schedulePath, defaultSchedule());
 
-    schedule.days[day].entries.push({
+    if (!schedule[week]) {
+      schedule[week] = emptyWeek();
+    }
+
+    schedule[week].days[day].entries.push({
       id: `entry_${Date.now()}`,
       mode,
       type,
@@ -132,10 +153,13 @@ module.exports = {
     });
 
     writeJson(schedulePath, schedule);
+
     await updateOverviewMessage(client);
 
+    const weekLabel = week === "currentWeek" ? "aktuelle Woche" : "nächste Woche";
+
     await interaction.reply({
-      content: `✅ Eintrag für **${day}** wurde hinzugefügt.`,
+      content: `✅ Eintrag für **${day}** wurde zur **${weekLabel}** hinzugefügt.`,
       ephemeral: true
     });
   }
