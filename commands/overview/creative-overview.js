@@ -24,14 +24,28 @@ module.exports = {
           ? '✅ Wochenübersicht wurde aktualisiert.'
           : '✅ Wochenübersicht wurde erstellt.';
 
-      await interaction.reply({
+      if (interaction.replied || interaction.deferred) {
+        return interaction.followUp({
+          content: text,
+          ephemeral: true
+        });
+      }
+
+      return interaction.reply({
         content: text,
         ephemeral: true
       });
     } catch (error) {
       console.error('Fehler bei /create-overview:', error);
 
-      await interaction.reply({
+      if (interaction.replied || interaction.deferred) {
+        return interaction.followUp({
+          content: `❌ Fehler beim Erstellen der Übersicht: ${error.message}`,
+          ephemeral: true
+        });
+      }
+
+      return interaction.reply({
         content: `❌ Fehler beim Erstellen der Übersicht: ${error.message}`,
         ephemeral: true
       });

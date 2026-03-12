@@ -1,63 +1,91 @@
-const path = require('path');
-const { SlashCommandBuilder } = require('discord.js');
-const readJson = require('../../utils/readJson');
-const writeJson = require('../../utils/writeJson');
-const updateOverviewMessage = require('../../utils/updateOverviewMessage');
+const path = require("path");
+const { SlashCommandBuilder } = require("discord.js");
+const readJson = require("../../utils/readJson");
+const writeJson = require("../../utils/writeJson");
+const updateOverviewMessage = require("../../utils/updateOverviewMessage");
 
-const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
+const schedulePath = path.join(__dirname, "..", "..", "data", "schedule.json");
+
+function defaultSchedule() {
+  return {
+    weekOffset: 0,
+    days: {
+      monday: { meetingTime: "", entries: [] },
+      tuesday: { meetingTime: "", entries: [] },
+      wednesday: { meetingTime: "", entries: [] },
+      thursday: { meetingTime: "", entries: [] },
+      friday: { meetingTime: "", entries: [] },
+      saturday: { meetingTime: "", entries: [] },
+      sunday: { meetingTime: "", entries: [] }
+    }
+  };
+}
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('add-entry')
-    .setDescription('Fügt einen Eintrag zur Wochenübersicht hinzu')
+    .setName("add-entry")
+    .setDescription("Fügt einen Eintrag zur Wochenübersicht hinzu")
     .addStringOption(option =>
       option
-        .setName('day')
-        .setDescription('Wochentag')
+        .setName("day")
+        .setDescription("Wochentag")
         .setRequired(true)
         .addChoices(
-          { name: 'Montag', value: 'monday' },
-          { name: 'Dienstag', value: 'tuesday' },
-          { name: 'Mittwoch', value: 'wednesday' },
-          { name: 'Donnerstag', value: 'thursday' },
-          { name: 'Freitag', value: 'friday' },
-          { name: 'Samstag', value: 'saturday' },
-          { name: 'Sonntag', value: 'sunday' }
+          { name: "Montag", value: "monday" },
+          { name: "Dienstag", value: "tuesday" },
+          { name: "Mittwoch", value: "wednesday" },
+          { name: "Donnerstag", value: "thursday" },
+          { name: "Freitag", value: "friday" },
+          { name: "Samstag", value: "saturday" },
+          { name: "Sonntag", value: "sunday" }
         )
     )
     .addStringOption(option =>
       option
-        .setName('mode')
-        .setDescription('Art des Eintrags')
+        .setName("mode")
+        .setDescription("Art des Eintrags")
         .setRequired(true)
         .addChoices(
-          { name: 'Match', value: 'match' },
-          { name: 'Simple', value: 'simple' },
-          { name: 'Free', value: 'free' }
+          { name: "Match", value: "match" },
+          { name: "Simple", value: "simple" },
+          { name: "Free", value: "free" }
         )
     )
     .addStringOption(option =>
       option
-        .setName('type')
-        .setDescription('Typ, z. B. VPG, PLA, Friendly, T-Cup')
+        .setName("type")
+        .setDescription("Eventtyp")
+        .setRequired(false)
+        .addChoices(
+          { name: "🔥 VPG", value: "VPG" },
+          { name: "⚡ PLA", value: "PLA" },
+          { name: "🅿️ PL", value: "PL" },
+          { name: "🦁 RPL", value: "RPL" },
+          { name: "🌍 PLC International", value: "PLC International" },
+          { name: "🤝 FS", value: "FS" },
+          { name: "💣 Bomber Cup", value: "Bomber Cup" },
+          { name: "🌙 Night Cup", value: "Night Cup" },
+          { name: "🏆 T-Cup", value: "T-Cup" },
+          { name: "🚀 Aranity Cup", value: "Aranity Cup" },
+          { name: "🏋️ Leveln", value: "Leveln" }
+        )
+    )
+    .addStringOption(option =>
+      option
+        .setName("time")
+        .setDescription("Uhrzeit, z. B. 21:00")
         .setRequired(false)
     )
     .addStringOption(option =>
       option
-        .setName('time')
-        .setDescription('Uhrzeit, z. B. 21:00')
+        .setName("opponent")
+        .setDescription("Gegnername")
         .setRequired(false)
     )
     .addStringOption(option =>
       option
-        .setName('opponent')
-        .setDescription('Gegnername')
-        .setRequired(false)
-    )
-    .addStringOption(option =>
-      option
-        .setName('text')
-        .setDescription('Freitext oder Zusatztext')
+        .setName("text")
+        .setDescription("Freitext oder Zusatztext")
         .setRequired(false)
     ),
 
@@ -66,44 +94,33 @@ module.exports = {
 
     if (adminChannelId && interaction.channelId !== adminChannelId) {
       return interaction.reply({
-        content: '❌ Diesen Command kannst du nur im Admin-Channel nutzen.',
+        content: "❌ Diesen Command kannst du nur im Admin-Channel nutzen.",
         ephemeral: true
       });
     }
 
-    const day = interaction.options.getString('day');
-    const mode = interaction.options.getString('mode');
-    const type = interaction.options.getString('type') || '';
-    const time = interaction.options.getString('time') || '';
-    const opponent = interaction.options.getString('opponent') || '';
-    const text = interaction.options.getString('text') || '';
+    const day = interaction.options.getString("day");
+    const mode = interaction.options.getString("mode");
+    const type = interaction.options.getString("type") || "";
+    const time = interaction.options.getString("time") || "";
+    const opponent = interaction.options.getString("opponent") || "";
+    const text = interaction.options.getString("text") || "";
 
-    if (mode === 'free' && !text) {
+    if (mode === "free" && !text) {
       return interaction.reply({
-        content: '❌ Bei Mode **free** musst du ein Feld für **text** angeben.',
+        content: "❌ Bei Mode **free** musst du ein Feld für **text** angeben.",
         ephemeral: true
       });
     }
 
-    if (mode === 'match' && !type) {
+    if ((mode === "match" || mode === "simple") && !type) {
       return interaction.reply({
-        content: '❌ Bei Mode **match** solltest du mindestens einen **type** angeben.',
+        content: "❌ Bei **match** oder **simple** musst du einen **type** angeben.",
         ephemeral: true
       });
     }
 
-    const schedule = readJson(schedulePath, {
-      weekOffset: 0,
-      days: {
-        monday: { meetingTime: '', entries: [] },
-        tuesday: { meetingTime: '', entries: [] },
-        wednesday: { meetingTime: '', entries: [] },
-        thursday: { meetingTime: '', entries: [] },
-        friday: { meetingTime: '', entries: [] },
-        saturday: { meetingTime: '', entries: [] },
-        sunday: { meetingTime: '', entries: [] }
-      }
-    });
+    const schedule = readJson(schedulePath, defaultSchedule());
 
     schedule.days[day].entries.push({
       id: `entry_${Date.now()}`,

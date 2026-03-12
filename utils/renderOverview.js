@@ -1,5 +1,6 @@
 const path = require('path');
 const readJson = require('./readJson');
+const eventTypes = require('./eventTypes');
 const {
   getWeekDates,
   formatDate,
@@ -16,21 +17,34 @@ function sortEntries(entries = []) {
   });
 }
 
-function renderEntry(entry) {
-  const type = entry.type || 'Eintrag';
-  const time = entry.time ? ` ${entry.time} Uhr` : '';
-  const opponent = entry.opponent ? ` vs. ${entry.opponent}` : '';
-  const text = entry.text ? ` ${entry.text}` : '';
+function formatTime(time) {
+  return time ? `**${time} Uhr**` : '';
+}
 
+function renderEntry(entry) {
   if (entry.mode === 'free') {
     return `• ${entry.text || 'Freier Eintrag'}`;
   }
 
+  const typeInfo = eventTypes[entry.type] || {};
+  const emoji = typeInfo.emoji ? `${typeInfo.emoji} ` : '';
+  const typeLabel = entry.type || 'Eintrag';
+  const timeLabel = formatTime(entry.time);
+  const opponent = entry.opponent ? ` vs. ${entry.opponent}` : '';
+  const text = entry.text ? ` ${entry.text}` : '';
+
   if (entry.mode === 'simple') {
-    return `• ${type}:${time}`;
+    if (timeLabel) {
+      return `• ${emoji}${typeLabel}: ${timeLabel}${text}`;
+    }
+    return `• ${emoji}${typeLabel}${text}`;
   }
 
-  return `• ${type}:${time}${opponent}${text}`;
+  if (timeLabel) {
+    return `• ${emoji}${typeLabel}: ${timeLabel}${opponent}${text}`;
+  }
+
+  return `• ${emoji}${typeLabel}${opponent}${text}`;
 }
 
 function renderOverview() {
@@ -71,7 +85,7 @@ function renderOverview() {
     lines.push(`📅 **${label} - ${dateText}**`);
 
     if (dayData.meetingTime) {
-      lines.push(`🕘 **Treffpunkt:** ${dayData.meetingTime} Uhr`);
+      lines.push(`🕘 **Treffpunkt:** **${dayData.meetingTime} Uhr**`);
     }
 
     const sortedEntries = sortEntries(dayData.entries);
