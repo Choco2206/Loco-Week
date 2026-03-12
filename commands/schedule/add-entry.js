@@ -1,0 +1,125 @@
+const path = require('path');
+const { SlashCommandBuilder } = require('discord.js');
+const readJson = require('../../utils/readJson');
+const writeJson = require('../../utils/writeJson');
+const updateOverviewMessage = require('../../utils/updateOverviewMessage');
+
+const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName('add-entry')
+    .setDescription('Fügt einen Eintrag zur Wochenübersicht hinzu')
+    .addStringOption(option =>
+      option
+        .setName('day')
+        .setDescription('Wochentag')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Montag', value: 'monday' },
+          { name: 'Dienstag', value: 'tuesday' },
+          { name: 'Mittwoch', value: 'wednesday' },
+          { name: 'Donnerstag', value: 'thursday' },
+          { name: 'Freitag', value: 'friday' },
+          { name: 'Samstag', value: 'saturday' },
+          { name: 'Sonntag', value: 'sunday' }
+        )
+    )
+    .addStringOption(option =>
+      option
+        .setName('mode')
+        .setDescription('Art des Eintrags')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Match', value: 'match' },
+          { name: 'Simple', value: 'simple' },
+          { name: 'Free', value: 'free' }
+        )
+    )
+    .addStringOption(option =>
+      option
+        .setName('type')
+        .setDescription('Typ, z. B. VPG, PLA, Friendly, T-Cup')
+        .setRequired(false)
+    )
+    .addStringOption(option =>
+      option
+        .setName('time')
+        .setDescription('Uhrzeit, z. B. 21:00')
+        .setRequired(false)
+    )
+    .addStringOption(option =>
+      option
+        .setName('opponent')
+        .setDescription('Gegnername')
+        .setRequired(false)
+    )
+    .addStringOption(option =>
+      option
+        .setName('text')
+        .setDescription('Freitext oder Zusatztext')
+        .setRequired(false)
+    ),
+
+  async execute(interaction, client) {
+    const adminChannelId = process.env.ADMIN_CHANNEL_ID;
+
+    if (adminChannelId && interaction.channelId !== adminChannelId) {
+      return interaction.reply({
+        content: '❌ Diesen Command kannst du nur im Admin-Channel nutzen.',
+        ephemeral: true
+      });
+    }
+
+    const day = interaction.options.getString('day');
+    const mode = interaction.options.getString('mode');
+    const type = interaction.options.getString('type') || '';
+    const time = interaction.options.getString('time') || '';
+    const opponent = interaction.options.getString('opponent') || '';
+    const text = interaction.options.getString('text') || '';
+
+    if (mode === 'free' && !text) {
+      return interaction.reply({
+        content: '❌ Bei Mode **free** musst du ein Feld für **text** angeben.',
+        ephemeral: true
+      });
+    }
+
+    if (mode === 'match' && !type) {
+      return interaction.reply({
+        content: '❌ Bei Mode **match** solltest du mindestens einen **type** angeben.',
+        ephemeral: true
+      });
+    }
+
+    const schedule = readJson(schedulePath, {
+      weekOffset: 0,
+      days: {
+        monday: { meetingTime: '', entries: [] },
+        tuesday: { meetingTime: '', entries: [] },
+        wednesday: { meetingTime: '', entries: [] },
+        thursday: { meetingTime: '', entries: [] },
+        friday: { meetingTime: '', entries: [] },
+        saturday: { meetingTime: '', entries: [] },
+        sunday: { meetingTime: '', entries: [] }
+      }
+    });
+
+    schedule.days[day].entries.push({
+      id: `entry_${Date.now()}`,
+      mode,
+      type,
+      time,
+      opponent,
+      text
+    });
+
+    writeJson(schedulePath, schedule);
+    await updateOverviewMessage(client);
+
+    await interaction.reply({
+      content: `✅ Eintrag für **${day}** wurde hinzugefügt.`,
+      ephemeral: true
+    });
+  }
+};
