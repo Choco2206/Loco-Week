@@ -3,7 +3,16 @@
   "days": {
     "monday": {
       "meetingTime": "",
-      "entries": []
+      "entries": [
+        {
+          "id": "entry_1773355731786",
+          "mode": "match",
+          "type": "VPG",
+          "time": "21:00",
+          "opponent": "Samba",
+          "text": ""
+        }
+      ]
     },
     "tuesday": {
       "meetingTime": "",
