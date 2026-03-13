@@ -1,4 +1,5 @@
-const updateOverviewMessage = require('../../utils/updateOverviewMessage');
+const { MessageFlags } = require('discord.js');
+const updateAllOverviewMessages = require('../../utils/updateAllOverviewMessages');
 
 module.exports = {
   customId: 'lw_refresh_overview',
@@ -7,15 +8,15 @@ module.exports = {
     if (interaction.channelId !== process.env.ADMIN_CHANNEL_ID) {
       return interaction.reply({
         content: '❌ Nur im Admin-Channel nutzbar.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
-    await updateOverviewMessage(client);
+    await updateAllOverviewMessages(client);
 
     await interaction.reply({
-      content: '✅ Wochenübersicht wurde aktualisiert.',
-      ephemeral: true
+      content: '✅ Öffentliche Übersicht und Next-Week-Preview wurden aktualisiert.',
+      flags: MessageFlags.Ephemeral
     });
   }
 };

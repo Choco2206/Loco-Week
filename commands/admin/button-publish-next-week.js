@@ -1,7 +1,8 @@
 const path = require('path');
+const { MessageFlags } = require('discord.js');
 const readJson = require('../../utils/readJson');
 const writeJson = require('../../utils/writeJson');
-const updateOverviewMessage = require('../../utils/updateOverviewMessage');
+const updateAllOverviewMessages = require('../../utils/updateAllOverviewMessages');
 
 const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
 
@@ -33,7 +34,7 @@ module.exports = {
     if (interaction.channelId !== process.env.ADMIN_CHANNEL_ID) {
       return interaction.reply({
         content: '❌ Nur im Admin-Channel nutzbar.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -43,11 +44,11 @@ module.exports = {
     schedule.nextWeek = emptyWeek();
 
     writeJson(schedulePath, schedule);
-    await updateOverviewMessage(client);
+    await updateAllOverviewMessages(client);
 
     await interaction.reply({
-      content: '✅ Die vorbereitete nächste Woche ist jetzt live.',
-      ephemeral: true
+      content: '✅ Die vorbereitete nächste Woche ist jetzt live. Die öffentliche Wochenübersicht wurde überschrieben und die neue Next-Week-Vorschau wurde geleert.',
+      flags: MessageFlags.Ephemeral
     });
   }
 };

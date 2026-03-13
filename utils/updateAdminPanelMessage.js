@@ -24,13 +24,19 @@ function buildAdminPanelComponents(disabled = false) {
       .setDisabled(disabled),
 
     new ButtonBuilder()
-      .setCustomId('lw_delete_entry_start')
-      .setLabel('Eintrag löschen')
-      .setStyle(ButtonStyle.Danger)
+      .setCustomId('lw_set_meeting_start')
+      .setLabel('Treffpunkt setzen')
+      .setStyle(ButtonStyle.Secondary)
       .setDisabled(disabled)
   );
 
   const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('lw_delete_entry_start')
+      .setLabel('Eintrag löschen')
+      .setStyle(ButtonStyle.Danger)
+      .setDisabled(disabled),
+
     new ButtonBuilder()
       .setCustomId('lw_publish_next_week')
       .setLabel('Nächste Woche live')
@@ -41,8 +47,10 @@ function buildAdminPanelComponents(disabled = false) {
       .setCustomId('lw_reset_current_week')
       .setLabel('Aktuelle Woche leeren')
       .setStyle(ButtonStyle.Danger)
-      .setDisabled(disabled),
+      .setDisabled(disabled)
+  );
 
+  const row3 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('lw_reset_next_week')
       .setLabel('Nächste Woche leeren')
@@ -50,21 +58,7 @@ function buildAdminPanelComponents(disabled = false) {
       .setDisabled(disabled)
   );
 
-  return [row1, row2];
-}
-
-async function disableOldPanelIfExists(channel, messageId) {
-  if (!messageId) return;
-
-  try {
-    const oldMessage = await channel.messages.fetch(messageId);
-    await oldMessage.edit({
-      content: '⚙️ **Loco Week Admin Panel** *(veraltet)*',
-      components: buildAdminPanelComponents(true)
-    });
-  } catch {
-    // Alte Nachricht existiert nicht mehr oder kann nicht bearbeitet werden
-  }
+  return [row1, row2, row3];
 }
 
 async function updateAdminPanelMessage(client) {
@@ -90,7 +84,6 @@ async function updateAdminPanelMessage(client) {
     components: buildAdminPanelComponents(false)
   };
 
-  // Wenn schon ein Panel gespeichert ist, dieses zuerst bearbeiten
   if (panelData.messageId) {
     try {
       const existingMessage = await channel.messages.fetch(panelData.messageId);
@@ -101,11 +94,10 @@ async function updateAdminPanelMessage(client) {
         messageId: existingMessage.id
       };
     } catch {
-      // gespeicherte Nachricht ist weg, wir erstellen neu
+      // gespeicherte Nachricht existiert nicht mehr
     }
   }
 
-  // Falls in den letzten Nachrichten schon ein aktives Panel existiert, dieses übernehmen
   try {
     const recentMessages = await channel.messages.fetch({ limit: 20 });
     const existingPanel = recentMessages.find(
@@ -129,7 +121,7 @@ async function updateAdminPanelMessage(client) {
       };
     }
   } catch {
-    // wenn das fehlschlägt, erstellen wir einfach neu
+    // falls fetch fehlschlägt, erstellen wir neu
   }
 
   const newMessage = await channel.send(payload);

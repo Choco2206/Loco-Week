@@ -1,7 +1,8 @@
 const path = require('path');
+const { MessageFlags } = require('discord.js');
 const readJson = require('../../utils/readJson');
 const writeJson = require('../../utils/writeJson');
-const updateOverviewMessage = require('../../utils/updateOverviewMessage');
+const updateAllOverviewMessages = require('../../utils/updateAllOverviewMessages');
 const { getState, clearState } = require('../../utils/panelState');
 
 const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
@@ -36,7 +37,7 @@ module.exports = {
     if (!state?.week || !state?.day || !state?.type) {
       return interaction.reply({
         content: '❌ Keine gültige Auswahl gefunden. Starte bitte erneut über das Admin Panel.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -61,13 +62,13 @@ module.exports = {
     writeJson(schedulePath, schedule);
     clearState(interaction.user.id);
 
-    await updateOverviewMessage(client);
+    await updateAllOverviewMessages(client);
 
     const weekLabel = state.week === 'currentWeek' ? 'aktuelle Woche' : 'nächste Woche';
 
     await interaction.reply({
       content: `✅ Termin wurde zur **${weekLabel}** hinzugefügt.`,
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 };
