@@ -3,8 +3,10 @@ const { SlashCommandBuilder } = require("discord.js");
 const readJson = require("../../utils/readJson");
 const writeJson = require("../../utils/writeJson");
 const updateOverviewMessage = require("../../utils/updateOverviewMessage");
+const eventTypes = require("../../utils/eventTypes");
 
 const schedulePath = path.join(__dirname, "..", "..", "data", "schedule.json");
+const opponentsPath = path.join(__dirname, "..", "..", "data", "opponents.json");
 
 function emptyWeek() {
   return {
@@ -95,8 +97,9 @@ module.exports = {
     .addStringOption(option =>
       option
         .setName("opponent")
-        .setDescription("Gegnername")
+        .setDescription("Gegner auswählen")
         .setRequired(false)
+        .setAutocomplete(true)
     )
     .addStringOption(option =>
       option
@@ -104,6 +107,36 @@ module.exports = {
         .setDescription("Freitext oder Zusatztext")
         .setRequired(false)
     ),
+
+  async autocomplete(interaction) {
+    const focused = interaction.options.getFocused(true);
+
+    if (focused.name !== "opponent") return;
+
+    const type = interaction.options.getString("type");
+    if (!type) {
+      return interaction.respond([]);
+    }
+
+    const typeInfo = eventTypes[type];
+    if (!typeInfo?.league) {
+      return interaction.respond([]);
+    }
+
+    const opponents = readJson(opponentsPath, {});
+    const list = opponents[type] || [];
+    const query = focused.value.toLowerCase();
+
+    const filtered = list
+      .filter(team => team.toLowerCase().includes(query))
+      .slice(0, 25)
+      .map(team => ({
+        name: team,
+        value: team
+      }));
+
+    await interaction.respond(filtered);
+  },
 
   async execute(interaction, client) {
     const adminChannelId = process.env.ADMIN_CHANNEL_ID;
@@ -133,6 +166,14 @@ module.exports = {
     if ((mode === "match" || mode === "simple") && !type) {
       return interaction.reply({
         content: "❌ Bei **match** oder **simple** musst du einen **type** angeben.",
+        ephemeral: true
+      });
+    }
+
+    const typeInfo = eventTypes[type];
+    if (mode === "match" && typeInfo?.league && !opponent) {
+      return interaction.reply({
+        content: "❌ Bei Liga-Spielen musst du einen **opponent** auswählen.",
         ephemeral: true
       });
     }

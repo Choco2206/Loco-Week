@@ -9,11 +9,19 @@ const {
   Events
 } = require('discord.js');
 
+if (!process.env.DISCORD_TOKEN) {
+  console.error('❌ DISCORD_TOKEN fehlt in der .env');
+  process.exit(1);
+}
+
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
 client.commands = new Collection();
+client.buttons = new Collection();
+client.selectMenus = new Collection();
+client.modals = new Collection();
 
 const commandsPath = path.join(__dirname, 'commands');
 
@@ -25,18 +33,30 @@ if (fs.existsSync(commandsPath)) {
 
     if (!fs.statSync(folderPath).isDirectory()) continue;
 
-    const commandFiles = fs
-      .readdirSync(folderPath)
-      .filter(file => file.endsWith('.js'));
+    const files = fs.readdirSync(folderPath).filter(file => file.endsWith('.js'));
 
-    for (const file of commandFiles) {
+    for (const file of files) {
       const filePath = path.join(folderPath, file);
-      const command = require(filePath);
+      const item = require(filePath);
 
-      if ('data' in command && 'execute' in command) {
-        client.commands.set(command.data.name, command);
-      } else {
-        console.log(`[WARNUNG] Datei ohne data/execute: ${filePath}`);
+      if (item.data && item.execute) {
+        client.commands.set(item.data.name, item);
+        console.log(`✅ Command geladen: ${item.data.name}`);
+      }
+
+      if (item.customId && item.executeButton) {
+        client.buttons.set(item.customId, item);
+        console.log(`✅ Button-Handler geladen: ${item.customId}`);
+      }
+
+      if (item.customId && item.executeSelectMenu) {
+        client.selectMenus.set(item.customId, item);
+        console.log(`✅ SelectMenu-Handler geladen: ${item.customId}`);
+      }
+
+      if (item.customId && item.executeModal) {
+        client.modals.set(item.customId, item);
+        console.log(`✅ Modal-Handler geladen: ${item.customId}`);
       }
     }
   }
@@ -47,35 +67,47 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.on(Events.InteractionCreate, async interaction => {
+  try {
+    if (interaction.isAutocomplete()) {
+      const command = client.commands.get(interaction.commandName);
+      if (!command?.autocomplete) return;
 
-  if (interaction.isAutocomplete()) {
-
-    const command = client.commands.get(interaction.commandName);
-
-    if (!command?.autocomplete) return;
-
-    try {
       await command.autocomplete(interaction);
-    } catch (error) {
-      console.error(error);
+      return;
     }
 
-    return;
-  }
+    if (interaction.isChatInputCommand()) {
+      const command = client.commands.get(interaction.commandName);
+      if (!command) return;
+      await command.execute(interaction, client);
+      return;
+    }
 
-  if (!interaction.isChatInputCommand()) return;
+    if (interaction.isButton()) {
+      const handler = client.buttons.get(interaction.customId);
+      if (!handler) return;
+      await handler.executeButton(interaction, client);
+      return;
+    }
 
-  const command = client.commands.get(interaction.commandName);
+    if (interaction.isStringSelectMenu()) {
+      const handler = client.selectMenus.get(interaction.customId);
+      if (!handler) return;
+      await handler.executeSelectMenu(interaction, client);
+      return;
+    }
 
-  if (!command) return;
-
-  try {
-    await command.execute(interaction, client);
+    if (interaction.isModalSubmit()) {
+      const baseId = interaction.customId.split(':')[0];
+      const handler = client.modals.get(baseId);
+      if (!handler) return;
+      await handler.executeModal(interaction, client);
+    }
   } catch (error) {
-    console.error(`Fehler bei /${interaction.commandName}:`, error);
+    console.error('❌ Interaction-Fehler:', error);
 
     const payload = {
-      content: '❌ Beim Ausführen des Commands ist ein Fehler aufgetreten.',
+      content: '❌ Beim Ausführen ist ein Fehler aufgetreten.',
       ephemeral: true
     };
 
