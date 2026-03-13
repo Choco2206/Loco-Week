@@ -7,26 +7,21 @@ module.exports = {
     .setDescription('Erstellt oder aktualisiert das feste Loco Week Admin Panel'),
 
   async execute(interaction, client) {
-    console.log('--- ADMIN PANEL DEBUG ---');
-    console.log('interaction.channelId:', interaction.channelId);
-    console.log('process.env.ADMIN_CHANNEL_ID:', process.env.ADMIN_CHANNEL_ID);
-    console.log('channel name:', interaction.channel?.name);
-    console.log('parentId:', interaction.channel?.parentId || 'kein parent');
-    console.log('isThread:', interaction.channel?.isThread?.() || false);
+    const adminChannelId = process.env.ADMIN_CHANNEL_ID || '1481718684459466885';
 
-    if (interaction.channelId !== process.env.ADMIN_CHANNEL_ID) {
+    if (interaction.channelId !== adminChannelId) {
       return interaction.reply({
-        content: `❌ Falscher Channel.\nAktuell: \`${interaction.channelId}\`\nErwartet: \`${process.env.ADMIN_CHANNEL_ID}\``,
+        content: '❌ Diesen Command kannst du nur im Admin-Channel nutzen.',
         flags: MessageFlags.Ephemeral
       });
     }
 
     const result = await updateAdminPanelMessage(client);
 
-    const text =
-      result.action === 'edited'
-        ? '✅ Vorhandenes Admin Panel wurde aktualisiert.'
-        : '✅ Admin Panel wurde neu erstellt.';
+    let text = '✅ Admin Panel wurde aktualisiert.';
+    if (result.action === 'created') text = '✅ Admin Panel wurde neu erstellt.';
+    if (result.action === 'reused') text = '✅ Vorhandenes Admin Panel wurde übernommen und aktualisiert.';
+    if (result.action === 'edited') text = '✅ Vorhandenes Admin Panel wurde aktualisiert.';
 
     return interaction.reply({
       content: text,

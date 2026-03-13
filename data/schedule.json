@@ -23,7 +23,40 @@
       },
       "saturday": {
         "meetingTime": "",
-        "entries": []
+        "entries": [
+          {
+            "id": "entry_1773362150267",
+            "mode": "match",
+            "type": "Night Cup",
+            "time": "23:55",
+            "opponent": "",
+            "text": "/Start 00:15 Uhr"
+          },
+          {
+            "id": "entry_1773362150272",
+            "mode": "match",
+            "type": "Night Cup",
+            "time": "23:55",
+            "opponent": "",
+            "text": "/Start 00:15 Uhr"
+          },
+          {
+            "id": "entry_1773362150273",
+            "mode": "match",
+            "type": "Night Cup",
+            "time": "23:55",
+            "opponent": "",
+            "text": "/Start 00:15 Uhr"
+          },
+          {
+            "id": "entry_1773362238483",
+            "mode": "match",
+            "type": "Leveln",
+            "time": "20 bis 23:30 Uhr",
+            "opponent": "",
+            "text": ""
+          }
+        ]
       },
       "sunday": {
         "meetingTime": "",
@@ -45,31 +78,7 @@
             "text": "Heim"
           },
           {
-            "id": "entry_1773359997090",
-            "mode": "match",
-            "type": "PL",
-            "time": "21:25 Uhr",
-            "opponent": "Project XI",
-            "text": "Heim"
-          },
-          {
             "id": "entry_1773360038870",
-            "mode": "match",
-            "type": "PL",
-            "time": "21:50 Uhr",
-            "opponent": "FC Germania Zündorf",
-            "text": "Auswärts"
-          },
-          {
-            "id": "entry_1773360038890",
-            "mode": "match",
-            "type": "PL",
-            "time": "21:50 Uhr",
-            "opponent": "FC Germania Zündorf",
-            "text": "Auswärts"
-          },
-          {
-            "id": "entry_1773360038908",
             "mode": "match",
             "type": "PL",
             "time": "21:50 Uhr",
