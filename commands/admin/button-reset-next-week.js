@@ -3,29 +3,9 @@ const { MessageFlags } = require('discord.js');
 const readJson = require('../../utils/readJson');
 const writeJson = require('../../utils/writeJson');
 const updateAllOverviewMessages = require('../../utils/updateAllOverviewMessages');
+const { normalizeSchedule, emptyWeek } = require('../../utils/scheduleDefaults');
 
 const schedulePath = path.join(__dirname, '..', '..', 'data', 'schedule.json');
-
-function emptyWeek() {
-  return {
-    days: {
-      monday: { meetingTime: '', entries: [] },
-      tuesday: { meetingTime: '', entries: [] },
-      wednesday: { meetingTime: '', entries: [] },
-      thursday: { meetingTime: '', entries: [] },
-      friday: { meetingTime: '', entries: [] },
-      saturday: { meetingTime: '', entries: [] },
-      sunday: { meetingTime: '', entries: [] }
-    }
-  };
-}
-
-function defaultSchedule() {
-  return {
-    currentWeek: emptyWeek(),
-    nextWeek: emptyWeek()
-  };
-}
 
 module.exports = {
   customId: 'lw_reset_next_week',
@@ -38,7 +18,9 @@ module.exports = {
       });
     }
 
-    const schedule = readJson(schedulePath, defaultSchedule());
+    const rawSchedule = readJson(schedulePath, {});
+    const schedule = normalizeSchedule(rawSchedule);
+
     schedule.nextWeek = emptyWeek();
 
     writeJson(schedulePath, schedule);

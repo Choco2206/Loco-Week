@@ -2,33 +2,13 @@ const path = require('path');
 const readJson = require('./readJson');
 const eventTypes = require('./eventTypes');
 const {
-  getWeekDates,
   formatDate,
+  getWeekDatesFromMonday,
   getGermanDayLabel
 } = require('./dateHelper');
+const { normalizeSchedule } = require('./scheduleDefaults');
 
 const schedulePath = path.join(__dirname, '..', 'data', 'schedule.json');
-
-function emptyWeek() {
-  return {
-    days: {
-      monday: { meetingTime: '', entries: [] },
-      tuesday: { meetingTime: '', entries: [] },
-      wednesday: { meetingTime: '', entries: [] },
-      thursday: { meetingTime: '', entries: [] },
-      friday: { meetingTime: '', entries: [] },
-      saturday: { meetingTime: '', entries: [] },
-      sunday: { meetingTime: '', entries: [] }
-    }
-  };
-}
-
-function defaultSchedule() {
-  return {
-    currentWeek: emptyWeek(),
-    nextWeek: emptyWeek()
-  };
-}
 
 function sortEntries(entries = []) {
   return [...entries].sort((a, b) => {
@@ -69,9 +49,10 @@ function renderEntry(entry) {
 }
 
 function renderNextWeekOverview() {
-  const schedule = readJson(schedulePath, defaultSchedule());
-  const nextWeek = schedule.nextWeek || emptyWeek();
-  const weekDates = getWeekDates('next');
+  const rawSchedule = readJson(schedulePath, {});
+  const schedule = normalizeSchedule(rawSchedule);
+  const nextWeek = schedule.nextWeek;
+  const weekDates = getWeekDatesFromMonday(schedule.nextWeekStart);
 
   const orderedDays = [
     'monday',

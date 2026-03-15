@@ -1,12 +1,5 @@
-function getMonday(date = new Date()) {
-  const current = new Date(date);
-  const day = current.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-
-  current.setHours(0, 0, 0, 0);
-  current.setDate(current.getDate() + diff);
-
-  return current;
+function parseIsoDate(isoDate) {
+  return new Date(`${isoDate}T00:00:00`);
 }
 
 function addDays(date, days) {
@@ -22,12 +15,8 @@ function formatDate(date) {
   return `${day}.${month}.${year}`;
 }
 
-function getWeekDates(weekType = 'current') {
-  const monday = getMonday(new Date());
-
-  if (weekType === 'next') {
-    monday.setDate(monday.getDate() + 7);
-  }
+function getWeekDatesFromMonday(isoMondayDate) {
+  const monday = parseIsoDate(isoMondayDate);
 
   return {
     monday: addDays(monday, 0),
@@ -55,7 +44,7 @@ function getGermanDayLabel(dayKey) {
 }
 
 module.exports = {
-  getWeekDates,
   formatDate,
+  getWeekDatesFromMonday,
   getGermanDayLabel
 };
