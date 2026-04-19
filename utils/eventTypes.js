@@ -54,12 +54,12 @@ module.exports = {
     league: false
   },
   "PL Pokal": {
-  emoji: "🏆",
+  emoji: "🅿🏆",
   league: false
 },
 
 "VPG Pokal": {
-  emoji: "🔥",
+  emoji: "🔥🏆",
   league: false
 },
 };
