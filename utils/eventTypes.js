@@ -53,6 +53,7 @@ module.exports = {
     emoji: "🏋️",
     league: false
   },
+  
   "PL Pokal": {
   emoji: "🅿🏆",
   league: false
