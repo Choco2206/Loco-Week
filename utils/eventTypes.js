@@ -52,5 +52,14 @@ module.exports = {
   Leveln: {
     emoji: "🏋️",
     league: false
-  }
+  },
+  "PL Pokal": {
+  emoji: "🏆",
+  league: false
+},
+
+"VPG Pokal": {
+  emoji: "🔥",
+  league: false
+},
 };
