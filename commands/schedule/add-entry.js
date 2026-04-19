@@ -85,7 +85,9 @@ module.exports = {
           { name: "🌙 Night Cup", value: "Night Cup" },
           { name: "🏆 T-Cup", value: "T-Cup" },
           { name: "🚀 Aranity Cup", value: "Aranity Cup" },
-          { name: "🏋️ Leveln", value: "Leveln" }
+          { name: "🏋️ Leveln", value: "Leveln" },
+          { name: "🅿🏆 PL Pokal", value: "PL Pokal" },
+{ name: "🔥🏆 VPG Pokal", value: "VPG Pokal" }
         )
     )
     .addStringOption(option =>
