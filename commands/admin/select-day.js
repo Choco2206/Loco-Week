@@ -31,7 +31,9 @@ module.exports = {
           { label: '🌙 Night Cup', value: 'Night Cup' },
           { label: '🏆 T-Cup', value: 'T-Cup' },
           { label: '🚀 Aranity Cup', value: 'Aranity Cup' },
-          { label: '🏋️ Leveln', value: 'Leveln' }
+          { label: '🏋️ Leveln', value: 'Leveln' },
+          { label: '🅿🏆 PL Pokal', value: 'PL Pokal' },
+{ label: '🔥🏆 VPG Pokal', value: 'VPG Pokal' }
         )
     );
 
