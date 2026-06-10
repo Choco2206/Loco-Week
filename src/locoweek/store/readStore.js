@@ -1,24 +1,20 @@
-const fs = require('fs');
+const fs = require("fs");
+const { ensureStore } = require("./ensureStore");
+const {
+  CURRENT_WEEK_FILE,
+  NEXT_WEEK_FILE,
+  SETTINGS_FILE
+} = require("./paths");
 
-function readStore(filePath, fallback = {}) {
-  try {
-    if (!fs.existsSync(filePath)) {
-      return fallback;
-    }
+function readJson(filePath) {
+  ensureStore();
 
-    const raw = fs.readFileSync(filePath, 'utf8');
-
-    if (!raw.trim()) {
-      return fallback;
-    }
-
-    return JSON.parse(raw);
-  } catch (error) {
-    console.error(`❌ Fehler beim Lesen von ${filePath}`, error);
-    return fallback;
-  }
+  const raw = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(raw);
 }
 
 module.exports = {
-  readStore
+  readCurrentWeek: () => readJson(CURRENT_WEEK_FILE),
+  readNextWeek: () => readJson(NEXT_WEEK_FILE),
+  readSettings: () => readJson(SETTINGS_FILE)
 };
