@@ -1,69 +1,49 @@
-const fs = require('fs');
-
+const fs = require("fs");
 const {
   DATA_DIR,
   CURRENT_WEEK_FILE,
   NEXT_WEEK_FILE,
-  EVENT_TYPES_FILE,
-  TEAMS_FILE,
-  SETTINGS_FILE,
-  MESSAGES_FILE
-} = require('./paths');
+  SETTINGS_FILE
+} = require("./paths");
 
-function writeJsonIfMissing(filePath, defaultData) {
-  if (fs.existsSync(filePath)) return;
-
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify(defaultData, null, 2),
-    'utf8'
-  );
+function getEmptyWeek(weekNumber = null) {
+  return {
+    weekNumber,
+    days: {
+      monday: "",
+      tuesday: "",
+      wednesday: "",
+      thursday: "",
+      friday: "",
+      saturday: "",
+      sunday: ""
+    }
+  };
 }
 
-function ensureStore() {
+function ensureJsonFile(filePath, defaultData) {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  writeJsonIfMissing(CURRENT_WEEK_FILE, {
-    weekOffset: 0,
-    entries: []
-  });
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), "utf8");
+  }
+}
 
-  writeJsonIfMissing(NEXT_WEEK_FILE, {
-    weekOffset: 1,
-    entries: []
-  });
+function ensureStore() {
+  ensureJsonFile(CURRENT_WEEK_FILE, getEmptyWeek());
+  ensureJsonFile(NEXT_WEEK_FILE, getEmptyWeek());
 
-  writeJsonIfMissing(EVENT_TYPES_FILE, {
-    types: [
-      'Freundschaftsspiel',
-      'PL',
-      'VPG',
-      'PLA',
-      'RPL',
-      'PL International',
-      'Cup',
-      'Sonstiges'
-    ]
-  });
-
-  writeJsonIfMissing(TEAMS_FILE, {
-    teams: {}
-  });
-
-  writeJsonIfMissing(SETTINGS_FILE, {
-    timezone: 'Europe/Berlin'
-  });
-
-  writeJsonIfMissing(MESSAGES_FILE, {
-    adminPanelMessageId: '',
-    currentWeekMessageId: '',
-    nextWeekPreviewMessageId: '',
-    headerMessageId: ''
+  ensureJsonFile(SETTINGS_FILE, {
+    weekChannelId: "",
+    nextWeekChannelId: "",
+    currentWeekMessageId: "",
+    nextWeekMessageId: ""
   });
 }
 
 module.exports = {
-  ensureStore
+  ensureStore,
+  getEmptyWeek
 };
