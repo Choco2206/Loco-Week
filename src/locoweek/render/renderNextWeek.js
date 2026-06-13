@@ -3,7 +3,6 @@ const { EmbedBuilder } = require('discord.js');
 function renderNextWeek() {
   const embed = new EmbedBuilder()
     .setColor('#c1121f')
-    .setImage(process.env.NEXT_WEEK_BANNER_URL || null)
     .setDescription(
       [
         '## 🔮 Nächste Woche',
@@ -35,6 +34,10 @@ function renderNextWeek() {
       ].join('\n')
     )
     .setTimestamp();
+
+  if (process.env.NEXT_WEEK_BANNER_URL) {
+    embed.setImage(process.env.NEXT_WEEK_BANNER_URL);
+  }
 
   return {
     embeds: [embed],
