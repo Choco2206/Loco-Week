@@ -2,6 +2,7 @@ const { setupLocoWeek } = require('../setupLocoWeek');
 const { readStore } = require('../store/readStore');
 const { writeStore } = require('../store/writeStore');
 const { MESSAGES_FILE, EVENT_TYPES_FILE } = require('../store/paths');
+const { openTeams } = require('../actions/manageTeams');
 
 const { openEventTypes, normalizeEventTypes } = require('../actions/manageEventTypes');
 const { openAddEventTypeModal } = require('../actions/addEventType');
@@ -96,6 +97,11 @@ async function handleLocoWeekInteraction(interaction, client) {
       await openEventTypes(interaction);
       return;
     }
+
+if (interaction.customId === 'manage_teams') {
+  await openTeams(interaction);
+  return;
+}
 
     if (interaction.customId === 'event_type_add') {
       await openAddEventTypeModal(interaction);
