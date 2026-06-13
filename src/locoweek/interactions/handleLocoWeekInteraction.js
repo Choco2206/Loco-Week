@@ -45,6 +45,23 @@ async function handleLocoWeekInteraction(interaction, client) {
   await openEventTypes(interaction);
   return;
 }
+
+if (interaction.customId === 'event_type_add') {
+  await interaction.reply({
+    content: '🚧 Event-Typ hinzufügen kommt als Nächstes.',
+    ephemeral: true
+  });
+  return;
+}
+
+if (interaction.customId === 'event_type_delete') {
+  await interaction.reply({
+    content: '🚧 Event-Typ löschen kommt als Nächstes.',
+    ephemeral: true
+  });
+  return;
+}
+
     if (interaction.customId === 'cleanup_repost') {
       await handleCleanupRepost(interaction, client);
       return;
