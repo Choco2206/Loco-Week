@@ -109,10 +109,11 @@ function isValidTime(value) {
 }
 
 async function saveEntryAndRefresh(interaction, client, time, opponentFromModal = null) {
+  await interaction.deferReply({ ephemeral: true });
+
   if (!isValidTime(time)) {
-    await interaction.reply({
-      content: '❌ Bitte gib die Uhrzeit im Format `HH:MM` ein, z. B. `21:00`.',
-      ephemeral: true
+    await interaction.editReply({
+      content: '❌ Bitte gib die Uhrzeit im Format `HH:MM` ein, z. B. `21:00`.'
     });
     return;
   }
@@ -135,9 +136,8 @@ async function saveEntryAndRefresh(interaction, client, time, opponentFromModal 
 
   await setupLocoWeek(client);
 
-  await interaction.reply({
-    content: `✅ Termin gespeichert:\n🟢 **${entry.time} | ${entry.eventType}${entry.opponent ? ` | ${entry.opponent}` : ''}**`,
-    ephemeral: true
+  await interaction.editReply({
+    content: `✅ Termin gespeichert:\n🟢 **${entry.time} | ${entry.eventType}${entry.opponent ? ` | ${entry.opponent}` : ''}**`
   });
 }
 
