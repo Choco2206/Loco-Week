@@ -32,13 +32,9 @@ const DEFAULT_EVENT_TYPES = [
 ];
 
 function normalizeEventTypes(data) {
-  if (!data || !Array.isArray(data.types) || data.types.length === 0) {
-    return {
-      types: DEFAULT_EVENT_TYPES
-    };
-  }
+  const existingTypes = Array.isArray(data?.types) ? data.types : [];
 
-  const normalized = data.types
+  const normalized = existingTypes
     .map(type => {
       if (typeof type === 'string') {
         const defaultType = DEFAULT_EVENT_TYPES.find(
@@ -62,8 +58,18 @@ function normalizeEventTypes(data) {
     })
     .filter(Boolean);
 
+  for (const defaultType of DEFAULT_EVENT_TYPES) {
+    const exists = normalized.some(
+      type => type.name.toLowerCase() === defaultType.name.toLowerCase()
+    );
+
+    if (!exists) {
+      normalized.push(defaultType);
+    }
+  }
+
   return {
-    types: normalized.length ? normalized : DEFAULT_EVENT_TYPES
+    types: normalized
   };
 }
 
