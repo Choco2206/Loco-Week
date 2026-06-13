@@ -40,6 +40,11 @@ async function handleCleanupRepost(interaction, client) {
 
 async function handleLocoWeekInteraction(interaction, client) {
   if (interaction.isButton()) {
+    
+    if (interaction.customId === 'manage_event_types') {
+  await openEventTypes(interaction);
+  return;
+}
     if (interaction.customId === 'cleanup_repost') {
       await handleCleanupRepost(interaction, client);
       return;
