@@ -2,14 +2,16 @@ const { setupLocoWeek } = require('../setupLocoWeek');
 const { readStore } = require('../store/readStore');
 const { writeStore } = require('../store/writeStore');
 const { MESSAGES_FILE, EVENT_TYPES_FILE } = require('../store/paths');
+
 const { openTeams } = require('../actions/manageTeams');
+const { openAddTeamModal, handleAddTeamSubmit } = require('../actions/addTeam');
+const { setSelectedLeague } = require('../store/teamSelectionStore');
 
 const { openEventTypes, normalizeEventTypes } = require('../actions/manageEventTypes');
 const { openAddEventTypeModal } = require('../actions/addEventType');
 
 async function deleteBotMessages(channel, client, limit = 100) {
   const messages = await channel.messages.fetch({ limit });
-
   const botMessages = messages.filter(msg => msg.author.id === client.user.id);
 
   for (const msg of botMessages.values()) {
@@ -98,10 +100,23 @@ async function handleLocoWeekInteraction(interaction, client) {
       return;
     }
 
-if (interaction.customId === 'manage_teams') {
-  await openTeams(interaction);
-  return;
-}
+    if (interaction.customId === 'manage_teams') {
+      await openTeams(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'team_add') {
+      await openAddTeamModal(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'team_delete') {
+      await interaction.reply({
+        content: '🚧 Team löschen kommt als Nächstes.',
+        ephemeral: true
+      });
+      return;
+    }
 
     if (interaction.customId === 'event_type_add') {
       await openAddEventTypeModal(interaction);
@@ -129,6 +144,18 @@ if (interaction.customId === 'manage_teams') {
   }
 
   if (interaction.isStringSelectMenu()) {
+    if (interaction.customId === 'team_group_select') {
+      const selectedLeague = interaction.values[0];
+
+      setSelectedLeague(interaction.user.id, selectedLeague);
+
+      await interaction.reply({
+        content: `✅ Bereich ausgewählt: **${selectedLeague}**\nDu kannst jetzt auf **Team hinzufügen** klicken.`,
+        ephemeral: true
+      });
+      return;
+    }
+
     console.log(`📋 SelectMenu: ${interaction.customId}`);
     return;
   }
@@ -136,6 +163,11 @@ if (interaction.customId === 'manage_teams') {
   if (interaction.isModalSubmit()) {
     if (interaction.customId === 'event_type_add_modal') {
       await handleAddEventTypeSubmit(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'team_add_modal') {
+      await handleAddTeamSubmit(interaction);
       return;
     }
 
