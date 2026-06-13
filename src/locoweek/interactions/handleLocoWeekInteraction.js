@@ -2,6 +2,7 @@ const { setupLocoWeek } = require('../setupLocoWeek');
 const { readStore } = require('../store/readStore');
 const { writeStore } = require('../store/writeStore');
 const { MESSAGES_FILE } = require('../store/paths');
+const { openEventTypes } = require('../actions/manageEventTypes');
 
 async function deleteBotMessages(channel, client, limit = 100) {
   const messages = await channel.messages.fetch({ limit });
