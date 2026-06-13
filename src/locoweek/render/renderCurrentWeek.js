@@ -12,9 +12,12 @@ function renderCurrentWeek() {
   const weekInfo = getWeekInfo(0);
 
   const lines = [
-    `## KW ${weekInfo.weekNumber} • ${weekInfo.startDate} - ${weekInfo.endDate}`,
-    ''
-  ];
+  `## KW ${weekInfo.weekNumber} • ${weekInfo.startDate} - ${weekInfo.endDate}`,
+  '',
+  '‼️ **Allgemein gilt:**',
+  'Bitte immer maximal **10 Minuten vor Beginn** eintreffen, damit keine Unruhe entsteht.',
+  '',
+];
 
   for (const day of DAYS) {
     lines.push(`**${day.label}**`);
@@ -35,10 +38,6 @@ function renderCurrentWeek() {
 
     lines.push('');
   }
-
-  lines.push(
-    '‼️ **Allgemein gilt:** Bitte immer maximal **10 Minuten vor Beginn** eintreffen, damit keine Unruhe entsteht. ‼️'
-  );
 
   const embed = new EmbedBuilder()
     .setColor('#c1121f')
