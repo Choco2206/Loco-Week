@@ -55,8 +55,14 @@ function ensureStore() {
   });
 
   ensureJsonFile(TEAMS_FILE, {
-    teams: []
-  });
+  teams: {
+    PL: [],
+    VPG: [],
+    RPL: [],
+    PLA: [],
+    PL_INTERNATIONAL: []
+  }
+});
 
   ensureJsonFile(SETTINGS_FILE, {
     weekChannelId: "",
