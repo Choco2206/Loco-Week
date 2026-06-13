@@ -6,18 +6,9 @@ const {
   SETTINGS_FILE
 } = require("./paths");
 
-function getEmptyWeek(weekNumber = null) {
+function getEmptyWeek() {
   return {
-    weekNumber,
-    days: {
-      monday: "",
-      tuesday: "",
-      wednesday: "",
-      thursday: "",
-      friday: "",
-      saturday: "",
-      sunday: ""
-    }
+    entries: []
   };
 }
 
