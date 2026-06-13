@@ -1,6 +1,8 @@
 const {
   ActionRowBuilder,
-  StringSelectMenuBuilder
+  StringSelectMenuBuilder,
+  ButtonBuilder,
+  ButtonStyle
 } = require('discord.js');
 
 const { readStore } = require('../store/readStore');
@@ -92,21 +94,36 @@ async function openEventTypes(interaction) {
         : 'Kein Gegner erforderlich'
     }));
 
-  const row = new ActionRowBuilder().addComponents(
+  const selectRow = new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId('event_type_select')
       .setPlaceholder('Event-Typ auswählen')
       .addOptions(options)
   );
 
+  const buttonRow = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('event_type_add')
+      .setLabel('Event-Typ hinzufügen')
+      .setEmoji('➕')
+      .setStyle(ButtonStyle.Success),
+
+    new ButtonBuilder()
+      .setCustomId('event_type_delete')
+      .setLabel('Event-Typ löschen')
+      .setEmoji('🗑️')
+      .setStyle(ButtonStyle.Danger)
+  );
+
   await interaction.reply({
     content: '🏷️ Event-Typen verwalten',
-    components: [row],
+    components: [selectRow, buttonRow],
     ephemeral: true
   });
 }
 
 module.exports = {
   openEventTypes,
-  DEFAULT_EVENT_TYPES
+  DEFAULT_EVENT_TYPES,
+  normalizeEventTypes
 };
