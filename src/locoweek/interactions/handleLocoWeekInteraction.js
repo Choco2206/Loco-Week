@@ -10,6 +10,17 @@ const { setSelectedLeague } = require('../store/teamSelectionStore');
 const { openEventTypes, normalizeEventTypes } = require('../actions/manageEventTypes');
 const { openAddEventTypeModal } = require('../actions/addEventType');
 
+const {
+  openAddEntryWeekSelect,
+  handleEntryWeekSelect,
+  handleEntryDaySelect,
+  handleEntryEventTypeSelect,
+  handleEntryTeamSelect,
+  getWeekFile,
+  buildEntryFromDraft,
+  clearEntryDraft
+} = require('../actions/addEntry');
+
 async function deleteBotMessages(channel, client, limit = 100) {
   const messages = await channel.messages.fetch({ limit });
   const botMessages = messages.filter(msg => msg.author.id === client.user.id);
@@ -93,8 +104,63 @@ async function handleAddEventTypeSubmit(interaction) {
   });
 }
 
+function isValidTime(value) {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
+async function saveEntryAndRefresh(interaction, client, time, opponentFromModal = null) {
+  if (!isValidTime(time)) {
+    await interaction.reply({
+      content: '❌ Bitte gib die Uhrzeit im Format `HH:MM` ein, z. B. `21:00`.',
+      ephemeral: true
+    });
+    return;
+  }
+
+  const entry = buildEntryFromDraft(interaction.user.id, time, opponentFromModal);
+  const filePath = getWeekFile(entry.week || undefined);
+
+  const data = readStore(filePath, { entries: [] });
+
+  data.entries.push(entry);
+
+  data.entries.sort((a, b) => {
+    if (a.day === b.day) return a.time.localeCompare(b.time);
+    return a.day.localeCompare(b.day);
+  });
+
+  writeStore(filePath, data);
+
+  clearEntryDraft(interaction.user.id);
+
+  await setupLocoWeek(client);
+
+  await interaction.reply({
+    content: `✅ Termin gespeichert:\n🟢 **${entry.time} | ${entry.eventType}${entry.opponent ? ` | ${entry.opponent}` : ''}**`,
+    ephemeral: true
+  });
+}
+
+async function handleEntryTimeSubmit(interaction, client) {
+  const time = interaction.fields.getTextInputValue('entry_time').trim();
+
+  await saveEntryAndRefresh(interaction, client, time);
+}
+
+async function handleEntryFreeOpponentSubmit(interaction, client) {
+  const opponent = interaction.fields.getTextInputValue('entry_opponent').trim();
+  const time = interaction.fields.getTextInputValue('entry_time').trim();
+
+  await saveEntryAndRefresh(interaction, client, time, opponent);
+}
+
 async function handleLocoWeekInteraction(interaction, client) {
   if (interaction.isButton()) {
+    if (interaction.customId === 'add_entry') {
+      await openAddEntryWeekSelect(interaction);
+      return;
+    }
+
     if (interaction.customId === 'manage_event_types') {
       await openEventTypes(interaction);
       return;
@@ -156,6 +222,26 @@ async function handleLocoWeekInteraction(interaction, client) {
       return;
     }
 
+    if (interaction.customId === 'entry_week_select') {
+      await handleEntryWeekSelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'entry_day_select') {
+      await handleEntryDaySelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'entry_event_type_select') {
+      await handleEntryEventTypeSelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'entry_team_select') {
+      await handleEntryTeamSelect(interaction);
+      return;
+    }
+
     console.log(`📋 SelectMenu: ${interaction.customId}`);
     return;
   }
@@ -168,6 +254,16 @@ async function handleLocoWeekInteraction(interaction, client) {
 
     if (interaction.customId === 'team_add_modal') {
       await handleAddTeamSubmit(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'entry_time_modal') {
+      await handleEntryTimeSubmit(interaction, client);
+      return;
+    }
+
+    if (interaction.customId === 'entry_free_opponent_modal') {
+      await handleEntryFreeOpponentSubmit(interaction, client);
       return;
     }
 
