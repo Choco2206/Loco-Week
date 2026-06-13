@@ -11,13 +11,17 @@ function renderCurrentWeek() {
 
   const weekInfo = getWeekInfo(0);
 
+  const bannerEmbed = new EmbedBuilder()
+    .setColor('#0099ff')
+    .setImage('attachment://loco-week.png');
+
   const lines = [
-  `## KW ${weekInfo.weekNumber} • ${weekInfo.startDate} - ${weekInfo.endDate}`,
-  '',
-  '‼️ **Allgemein gilt:**',
-  'Bitte immer maximal **10 Minuten vor Beginn** eintreffen, damit keine Unruhe entsteht.',
-  '',
-];
+    `## KW ${weekInfo.weekNumber} • ${weekInfo.startDate} - ${weekInfo.endDate}`,
+    '',
+    '‼️ **Allgemein gilt:**',
+    'Bitte immer maximal **10 Minuten vor Beginn** eintreffen, damit keine Unruhe entsteht.',
+    '',
+  ];
 
   for (const day of DAYS) {
     lines.push(`**${day.label}**`);
@@ -39,17 +43,19 @@ function renderCurrentWeek() {
     lines.push('');
   }
 
-  const embed = new EmbedBuilder()
-    .setColor('#c1121f')
+  const overviewEmbed = new EmbedBuilder()
+    .setColor('#0099ff')
     .setDescription(lines.join('\n'))
     .setTimestamp();
 
-  if (process.env.OVERVIEW_BANNER_URL) {
-    embed.setImage(process.env.OVERVIEW_BANNER_URL);
-  }
-
   return {
-    embeds: [embed]
+    embeds: [bannerEmbed, overviewEmbed],
+    files: [
+      {
+        attachment: './assets/banners/loco-week.png',
+        name: 'loco-week.png'
+      }
+    ]
   };
 }
 
