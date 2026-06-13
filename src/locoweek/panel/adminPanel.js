@@ -15,7 +15,9 @@ function buildAdminPanel() {
         '➕ Termine hinzufügen',
         '🗑️ Termine entfernen',
         '🏷️ Event-Typen verwalten',
-        '👥 Teams verwalten'
+        '👥 Teams verwalten',
+        '',
+        '🧹 Cleanup löscht die Bot-Nachrichten in den LocoWeek-Kanälen und postet alles einmal frisch.'
       ].join('\n')
     )
     .setColor('#c1121f')
@@ -46,7 +48,13 @@ function buildAdminPanel() {
       .setCustomId('manage_teams')
       .setLabel('Teams')
       .setEmoji('👥')
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
+
+    new ButtonBuilder()
+      .setCustomId('cleanup_repost')
+      .setLabel('Cleanup & Neu posten')
+      .setEmoji('🧹')
+      .setStyle(ButtonStyle.Primary)
   );
 
   return {
