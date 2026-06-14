@@ -7,6 +7,10 @@ const {
   handleLocoWeekInteraction
 } = require('./src/locoweek/interactions/handleLocoWeekInteraction');
 
+const {
+  startWeeklyRollover
+} = require('./src/locoweek/scheduler/weeklyRollover');
+
 if (!process.env.DISCORD_TOKEN) {
   console.error('❌ DISCORD_TOKEN fehlt in der .env');
   process.exit(1);
@@ -20,6 +24,8 @@ client.once(Events.ClientReady, async readyClient => {
   console.log(`✅ LocoWeek V2 online als ${readyClient.user.tag}`);
 
   await setupLocoWeek(readyClient);
+
+  startWeeklyRollover(readyClient);
 });
 
 client.on(Events.InteractionCreate, async interaction => {
