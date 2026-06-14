@@ -232,6 +232,7 @@ function buildEntryFromDraft(userId, time, opponentFromModal = null) {
 
   return {
     id: `${Date.now()}`,
+    week: draft.week,
     day: draft.day,
     time,
     eventType: draft.eventType,
