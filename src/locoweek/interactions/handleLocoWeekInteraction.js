@@ -21,6 +21,12 @@ const {
   clearEntryDraft
 } = require('../actions/addEntry');
 
+const {
+  openDeleteEntryWeekSelect,
+  handleDeleteEntryWeekSelect,
+  handleDeleteEntrySelect
+} = require('../actions/deleteEntry');
+
 async function deleteBotMessages(channel, client, limit = 100) {
   const messages = await channel.messages.fetch({ limit });
   const botMessages = messages.filter(msg => msg.author.id === client.user.id);
@@ -143,7 +149,6 @@ async function saveEntryAndRefresh(interaction, client, time, opponentFromModal 
 
 async function handleEntryTimeSubmit(interaction, client) {
   const time = interaction.fields.getTextInputValue('entry_time').trim();
-
   await saveEntryAndRefresh(interaction, client, time);
 }
 
@@ -154,10 +159,32 @@ async function handleEntryFreeOpponentSubmit(interaction, client) {
   await saveEntryAndRefresh(interaction, client, time, opponent);
 }
 
+async function handleDeleteEntryFinished(interaction, client) {
+  await interaction.deferReply({ ephemeral: true });
+
+  const deletedEntry = await handleDeleteEntrySelect(interaction);
+
+  await setupLocoWeek(client);
+
+  if (!deletedEntry) {
+    await interaction.editReply('❌ Termin wurde nicht gefunden oder war bereits gelöscht.');
+    return;
+  }
+
+  await interaction.editReply(
+    `✅ Termin gelöscht:\n🗑️ **${deletedEntry.time} | ${deletedEntry.eventType}${deletedEntry.opponent ? ` | ${deletedEntry.opponent}` : ''}**`
+  );
+}
+
 async function handleLocoWeekInteraction(interaction, client) {
   if (interaction.isButton()) {
     if (interaction.customId === 'add_entry') {
       await openAddEntryWeekSelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'delete_entry') {
+      await openDeleteEntryWeekSelect(interaction);
       return;
     }
 
@@ -178,7 +205,7 @@ async function handleLocoWeekInteraction(interaction, client) {
 
     if (interaction.customId === 'team_delete') {
       await interaction.reply({
-        content: '🚧 Team löschen kommt als Nächstes.',
+        content: '🚧 Team löschen ist aktuell nicht aktiviert.',
         ephemeral: true
       });
       return;
@@ -191,7 +218,7 @@ async function handleLocoWeekInteraction(interaction, client) {
 
     if (interaction.customId === 'event_type_delete') {
       await interaction.reply({
-        content: '🚧 Event-Typ löschen kommt als Nächstes.',
+        content: '🚧 Event-Typ löschen ist aktuell nicht aktiviert.',
         ephemeral: true
       });
       return;
@@ -239,6 +266,16 @@ async function handleLocoWeekInteraction(interaction, client) {
 
     if (interaction.customId === 'entry_team_select') {
       await handleEntryTeamSelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'delete_entry_week_select') {
+      await handleDeleteEntryWeekSelect(interaction);
+      return;
+    }
+
+    if (interaction.customId === 'delete_entry_select') {
+      await handleDeleteEntryFinished(interaction, client);
       return;
     }
 
