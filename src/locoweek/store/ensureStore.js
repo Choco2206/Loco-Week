@@ -8,6 +8,26 @@ const {
   SETTINGS_FILE
 } = require("./paths");
 
+const ARANITY_SUMMER_LEAGUE_TEAMS = [
+  "Intikam FC",
+  "Tactic Uni X",
+  "Athletic CF",
+  "Die Denco Army",
+  "GeR D3stRoYeRs",
+  "ULM eSports",
+  "Lion Unity",
+  "TSG eSPORTS",
+  "Rapid Juniors",
+  "VfB Lübeck eSports",
+  "KnappenHeim CF",
+  "Mövengang",
+  "SV Ubers",
+  "FV Brokenhausen",
+  "EFC Fessenheim",
+  "Silentis eSports",
+  "SK Rapid Wien eSport"
+];
+
 function getEmptyWeek() {
   return {
     entries: []
@@ -35,6 +55,7 @@ function ensureStore() {
       { name: "RPL", needsOpponent: true },
       { name: "PLA", needsOpponent: true },
       { name: "PL International", needsOpponent: true },
+      { name: "Aranity Summer League", needsOpponent: true },
       { name: "Freundschaftsspiel", needsOpponent: true },
 
       { name: "Level Session", needsOpponent: false },
@@ -60,9 +81,23 @@ function ensureStore() {
     VPG: [],
     RPL: [],
     PLA: [],
-    PL_INTERNATIONAL: []
+    PL_INTERNATIONAL: [],
+    ARANITY_SUMMER_LEAGUE: ARANITY_SUMMER_LEAGUE_TEAMS
   }
 });
+
+  const teamsData = JSON.parse(fs.readFileSync(TEAMS_FILE, "utf8"));
+  if (!teamsData.teams || typeof teamsData.teams !== "object") {
+    teamsData.teams = {};
+  }
+
+  if (
+    !Array.isArray(teamsData.teams.ARANITY_SUMMER_LEAGUE) ||
+    teamsData.teams.ARANITY_SUMMER_LEAGUE.length === 0
+  ) {
+    teamsData.teams.ARANITY_SUMMER_LEAGUE = [...ARANITY_SUMMER_LEAGUE_TEAMS];
+    fs.writeFileSync(TEAMS_FILE, JSON.stringify(teamsData, null, 2), "utf8");
+  }
 
   ensureJsonFile(SETTINGS_FILE, {
     weekChannelId: "",

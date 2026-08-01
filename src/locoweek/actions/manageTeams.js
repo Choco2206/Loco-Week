@@ -10,7 +10,8 @@ const TEAM_GROUPS = [
   { key: 'VPG', label: 'VPG' },
   { key: 'RPL', label: 'RPL' },
   { key: 'PLA', label: 'PLA' },
-  { key: 'PL_INTERNATIONAL', label: 'PL International' }
+  { key: 'PL_INTERNATIONAL', label: 'PL International' },
+  { key: 'ARANITY_SUMMER_LEAGUE', label: 'Aranity Summer League' }
 ];
 
 async function openTeams(interaction) {

@@ -63,7 +63,8 @@ async function handleAddTeamSubmit(interaction) {
       VPG: [],
       RPL: [],
       PLA: [],
-      PL_INTERNATIONAL: []
+      PL_INTERNATIONAL: [],
+      ARANITY_SUMMER_LEAGUE: []
     }
   });
 

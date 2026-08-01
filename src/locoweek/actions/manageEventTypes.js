@@ -15,6 +15,7 @@ const DEFAULT_EVENT_TYPES = [
   { name: 'RPL', needsOpponent: true },
   { name: 'PLA', needsOpponent: true },
   { name: 'PL International', needsOpponent: true },
+  { name: 'Aranity Summer League', needsOpponent: true },
   { name: 'Freundschaftsspiel', needsOpponent: true },
 
   { name: 'Level Session', needsOpponent: false },

@@ -35,7 +35,8 @@ const EVENT_TO_TEAM_GROUP = {
   VPG: 'VPG',
   RPL: 'RPL',
   PLA: 'PLA',
-  'PL International': 'PL_INTERNATIONAL'
+  'PL International': 'PL_INTERNATIONAL',
+  'Aranity Summer League': 'ARANITY_SUMMER_LEAGUE'
 };
 
 function getWeekFile(week) {
